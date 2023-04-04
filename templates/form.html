@@ -31,6 +31,9 @@
 
                     $("#chat_window").append(div);
                 }
+                const status = data['status']
+                html = `Всего участников:<b>${status['users_count']}</b>, сообщений: <b>${status['messages_count']}</b>`;
+                $("#status").html(html);
             }
            );
         }
@@ -69,5 +72,6 @@
 
     <br/>
     <input id="text" type="text" placeholder="Текст сообщения">
+    <div id="status"></div>
 </body>
 </html>

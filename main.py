@@ -1,4 +1,4 @@
-from datetime import datetime # Импортируем библиотеку
+from datetime import datetime
 import json
 from flask import Flask, render_template, request
 
@@ -8,11 +8,9 @@ from flask import Flask, render_template, request
 # jdon.loads - из строки
 
 
-
-
 def save_messages():
     data = {
-        "messages": all_new_messages
+        "messages": all_messages
     }
     with open('db.json', 'w', encoding="utf8") as file:
         json.dump(data, file, ensure_ascii=False)
@@ -31,7 +29,7 @@ def add_message(author, text):
       "text": text,
       "time": datetime.now().strftime("%H:%M:%S")
   }
-  all_new_messages.append(message)
+  all_messages.append(message)
   save_messages()
 
 
@@ -42,21 +40,23 @@ def print_message(msg):
 
 # Выводим все сообщения
 def print_all_messages():
-  for message in all_new_messages:
-    print_message(message)
+    for message in all_messages:
+        print_message(message)
 
 
-all_new_messages = load_messages()
+def users_count():
+    users = set()
+    for el in all_messages:
+        users.add(el['author'])
+    return len(users)
 
-# Добавляем сообщения в список
-# add_message("Саша", "Привет всем")
-# add_message(text="Привет, Саша", author="Юлия")
-# add_message("Кирилл", "Очень интересно")
-# add_message("Дарья", "Завтра точно буду еще участвовать")
 
-save_messages()
-#print_all_messages()
-print(all_new_messages)
+def status():
+    return {"users_count": users_count(), "messages_count": len(all_messages)}
+
+
+all_messages = load_messages()
+print(status())
 
 app = Flask(__name__)
 
@@ -73,7 +73,7 @@ def chat_page():
 
 @app.route('/get_messages')
 def get_messages():
-    return {'messages': all_new_messages}
+    return {'messages': all_messages, "status": status()}
 
 
 @app.route("/send_message")
